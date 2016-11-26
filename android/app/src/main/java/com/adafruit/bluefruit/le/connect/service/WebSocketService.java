@@ -89,7 +89,6 @@ public class WebSocketService {
                             colourChangingService.changeGemmaColour(GemmaColour.PINK);
                         } else {
                             colourChangingService.changeGemmaColour(GemmaColour.BLACK);
-                            mSocket.disconnect();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

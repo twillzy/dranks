@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements BleManager.BleMan
     private final static String kPreferences = "MainActivity_prefs";
     private final static String kPreferences_filtersPanelOpen = "filtersPanelOpen";
 
+    public static Activity activity;
     // Components
     private final static int kComponentsNameIds[] = {
             R.string.scan_connectservice_info,
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements BleManager.BleMan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         setContentView(R.layout.activity_main);
 
         // Init variables

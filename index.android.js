@@ -1,11 +1,7 @@
 import React from 'react';
 import {AppRegistry, StyleSheet, Text, View, TouchableHighlight, Image} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 const beer = {id: 1, name: 'beer', price: 8, calories: 100};
 const martini = {id: 2, name: 'martini', price: 20, calories: 300};
-const beerIcon = (<Icon name="beer" size={60} color="#FD5800"/>);
-const cocktailIcon = (<Icon name="glass" size={60} color="#FD5800"/>);
-const timesIcon = (<Icon name="times" size={20} color="grey"/>);
 window.navigator.userAgent = 'ReactNative';
 const io = require('socket.io-client/socket.io');
 
@@ -28,7 +24,7 @@ class HelloWorld extends React.Component {
     const socket = io('https://fathomless-peak-84606.herokuapp.com/', {transports: ['websocket']});
     socket.on('drinkBought', (data) => {
       this.setState({
-        spent: data.totalPrice,
+        spent: this.state.spent + data.totalPrice,
         remaining: this.state.remaining - data.totalPrice,
         beerQuantity: this.state.beerQuantity + data.quantities[0],
         martiniQuantity: this.state.martiniQuantity + data.quantities[1],
@@ -48,7 +44,8 @@ class HelloWorld extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image style={styles.profilePic} source={require(this.state.imageUrl)}/>
+          {this.state.isPoor && <Image style={styles.profilePic} source={require('./poor.png')}/>}
+          {!this.state.isPoor && <Image style={styles.profilePic} source={require('./will.png')}/>}
           <Text style={styles.profileNameText}>twillzy</Text>
         </View>
         <View style={styles.subHeader}>
@@ -58,27 +55,27 @@ class HelloWorld extends React.Component {
         <View style={styles.body}>
           {!!this.state.beerQuantity && <View style={styles.drinkPanel}>
             <View style={styles.drinkPanelLeft}>
-              {beerIcon}
+              <Image style={styles.drinkImage} source={require('./beer.png')} />
             </View>
             <View style={styles.drinkMiddlePanel}>
               <Text style={styles.quantity}>{this.state.totalBeerCalories}</Text>
               <Text style={styles.price}>Total Calories</Text>
             </View>
             <View style={styles.drinkPanelRight}>
-              <Text style={styles.quantity}>{timesIcon} {this.state.beerQuantity}</Text>
+              <Text style={styles.quantity}>X {this.state.beerQuantity}</Text>
               <Text style={styles.price}>Price: ${beer.price}</Text>
             </View>
           </View>}
           {!!this.state.martiniQuantity && <View style={styles.drinkPanel}>
             <View style={styles.drinkPanelLeft}>
-              {cocktailIcon}
+              <Image style={styles.drinkImage} source={require('./martini.jpg')} />
             </View>
             <View style={styles.drinkMiddlePanel}>
               <Text style={styles.quantity}>{this.state.totalMartiniCalories}</Text>
               <Text style={styles.price}>Total Calories</Text>
             </View>
             <View style={styles.drinkPanelRight}>
-              <Text style={styles.quantity}>{timesIcon} {this.state.martiniQuantity}</Text>
+              <Text style={styles.quantity}>X {this.state.martiniQuantity}</Text>
               <Text style={styles.price}>Price: ${martini.price}</Text>
             </View>
           </View>}
@@ -124,6 +121,10 @@ var styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
   },
+  drinkImage: {
+    width: 60,
+    height: 80,
+  },
   drinkPanel: {
     marginTop: 10,
     marginBottom: 10,
@@ -167,7 +168,7 @@ var styles = StyleSheet.create({
     flex: 5,
     fontFamily: 'sans-serif-condensed',
     fontWeight: 'bold',
-    fontSize: 50,
+    fontSize: 30,
     color: 'white',
   },
 });

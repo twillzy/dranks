@@ -76,7 +76,11 @@ public class WebSocketService {
                     } else if (drunkenness != null){
                         gemmaColour = GemmaColour.GREEN;
                     }
-                    colourChangingService.changeColour(gemmaColour);
+                    try {
+                        colourChangingService.changeGemmaColour(gemmaColour);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         } catch(Exception e) {

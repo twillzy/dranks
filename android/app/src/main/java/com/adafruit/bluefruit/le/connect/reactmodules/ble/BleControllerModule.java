@@ -24,9 +24,9 @@ public class BleControllerModule extends ReactContextBaseJavaModule implements A
     }
 
     @ReactMethod
-    public void changeColourToRed(Promise promise) {
+    public void changeColourToRed(Promise promise) throws InterruptedException {
         if (colourChangingService != null) {
-            colourChangingService.changeColour(GemmaColour.RED);
+            colourChangingService.changeGemmaColour(GemmaColour.RED);
             promise.resolve(true);
         } else {
             promise.reject(":(", ":(");
@@ -34,21 +34,13 @@ public class BleControllerModule extends ReactContextBaseJavaModule implements A
     }
 
     @ReactMethod
-    public void changeColourToBlue(Promise promise) {
-        colourChangingService.changeColour(GemmaColour.BLUE);
-        promise.resolve(true);
-    }
-
-    @ReactMethod
-    public void changeColourToPurple(Promise promise) {
-        colourChangingService.changeColour(GemmaColour.PURPLE);
-        promise.resolve(true);
-    }
-
-    @ReactMethod
-    public void changeColourToYellow(Promise promise) {
-        colourChangingService.changeColour(GemmaColour.YELLOW);
-        promise.resolve(true);
+    public void cycleColours(Promise promise) throws Exception {
+        if (colourChangingService != null) {
+            colourChangingService.momentOfDelight();
+            promise.resolve(true);
+        } else {
+            promise.reject(":(", ":(");
+        }
     }
 
     @Override

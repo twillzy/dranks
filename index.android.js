@@ -14,6 +14,7 @@ class HelloWorld extends React.Component {
     this.state = {
       budget : 200
     };
+    BLEControllerModule.cycleColours();
   }
   render() {
     return (

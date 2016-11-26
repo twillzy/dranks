@@ -15,9 +15,7 @@ public class ColourChangingService {
 
     // Service Constants
     public static final String UUID_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-    public static final String UUID_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     public static final String UUID_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-    public static final String UUID_DFU = "00001530-1212-EFDE-1523-785FEABCD123";
     public static final int kTxMaxCharacters = 20;
 
     // Data
@@ -33,12 +31,40 @@ public class ColourChangingService {
         onServicesDiscovered();
     }
 
-    public void changeColour(GemmaColour gemmaColour) {
+    public void changeGemmaColour(GemmaColour gemmaColour) throws InterruptedException {
         changeColour(gemmaColour.getColour());
     }
 
-    private void changeColour(int colour) {
+    public void momentOfDelight() throws Exception {
+        changeColour(GemmaColour.BLUE.getColour());
 
+        Thread.sleep(500);
+
+        for (int i = 0; i < 10; i++) {
+            turnOffNeoPixel();
+            Thread.sleep(80 + i);
+        }
+    }
+
+    private void turnOffNeoPixel() {
+        toggleNeoPixel(8, false);
+    }
+
+    private void turnOnNeoPixel() {
+        toggleNeoPixel(7, false);
+    }
+
+    private void toggleNeoPixel(int tag, boolean pressed) {
+        String data = "!B" + tag + (pressed ? "1" : "0");
+        ByteBuffer buffer = ByteBuffer.allocate(data.length()).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.put(data.getBytes());
+        sendDataWithCRC(buffer.array());
+    }
+
+    private void changeColour(int colour) throws InterruptedException {
+        for (int i = 0; i < 10; i++) {
+            turnOnNeoPixel();
+        }
         // Send selected color !Crgb
         byte r = (byte) ((colour >> 16) & 0xFF);
         byte g = (byte) ((colour >> 8) & 0xFF);
@@ -57,7 +83,6 @@ public class ColourChangingService {
 
         byte[] result = buffer.array();
         sendDataWithCRC(result);
-        Log.d(TAG, "SENT!");
     }
 
     protected void sendDataWithCRC(byte[] data) {

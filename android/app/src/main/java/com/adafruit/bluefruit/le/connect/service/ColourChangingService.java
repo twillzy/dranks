@@ -31,27 +31,17 @@ public class ColourChangingService {
         onServicesDiscovered();
     }
 
-    public void changeGemmaColour(GemmaColour gemmaColour) throws InterruptedException {
+    public void changeGemmaColour(GemmaColour gemmaColour) throws Exception {
+        turnOnAllNeoPixels();
         changeColour(gemmaColour.getColour());
+        turnOffAllNeoPixels(0l);
     }
 
     public void momentOfDelight() throws Exception {
+        turnOnAllNeoPixels();
         changeColour(GemmaColour.GREEN.getColour());
-
-        Thread.sleep(500);
-
-        for (int i = 0; i < 10; i++) {
-            turnOffNeoPixel();
-            Thread.sleep(80 + i);
-        }
-    }
-
-    private void turnOffNeoPixel() {
-        toggleNeoPixel(8, false);
-    }
-
-    private void turnOnNeoPixel() {
-        toggleNeoPixel(7, false);
+        Thread.sleep(10);
+        turnOffAllNeoPixels(80l);
     }
 
     private void toggleNeoPixel(int tag, boolean pressed) {
@@ -61,10 +51,7 @@ public class ColourChangingService {
         sendDataWithCRC(buffer.array());
     }
 
-    private void changeColour(int colour) throws InterruptedException {
-        for (int i = 0; i < 10; i++) {
-            turnOnNeoPixel();
-        }
+    private void changeColour(int colour) {
         // Send selected color !Crgb
         byte r = (byte) ((colour >> 16) & 0xFF);
         byte g = (byte) ((colour >> 8) & 0xFF);
@@ -83,6 +70,19 @@ public class ColourChangingService {
 
         byte[] result = buffer.array();
         sendDataWithCRC(result);
+    }
+
+    public void turnOnAllNeoPixels() {
+        for (int i = 0; i < 12; i++) {
+            toggleNeoPixel(7, false);
+        }
+    }
+
+    public void turnOffAllNeoPixels(Long delay) throws Exception {
+        for (int i = 0; i < 10; i++) {
+            toggleNeoPixel(8, false);
+            Thread.sleep(delay + i);
+        }
     }
 
     protected void sendDataWithCRC(byte[] data) {

@@ -7,7 +7,6 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
@@ -16,6 +15,7 @@ public class WebSocketService {
 
     private static final String TAG = "WEBSOCKET";
     public static final String URL = "https://fathomless-peak-84606.herokuapp.com";
+    private static final Integer BUDGET = 200;
     private final ColourChangingService colourChangingService;
     private Socket mSocket = null;
 
@@ -35,7 +35,7 @@ public class WebSocketService {
     }
 
     public void disconnect() {
-//        mSocket.disconnect();
+        mSocket.disconnect();
     }
 
     private void onDrinkBought() {
@@ -47,13 +47,19 @@ public class WebSocketService {
                 @Override
                 public void call(Object... args) {
                     try {
-                        colourChangingService.momentOfDelight();
+                        JSONObject jsonObject = (JSONObject) args[0];
+                        Integer totalPrice = (Integer) jsonObject.get("totalPrice");
+                        if (totalPrice != null && totalPrice < BUDGET) {
+                            colourChangingService.momentOfDelight();
+                        } else {
+                            colourChangingService.changeGemmaColour(GemmaColour.RED);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
-        } catch(Exception e) {
+        } catch (Exception e) {
 
         }
     }
@@ -67,27 +73,26 @@ public class WebSocketService {
                 @Override
                 public void call(Object... args) {
                     JSONObject jsonObject = (JSONObject) args[0];
-                    String drunkenness = null;
+                    Float drunkenness = null;
                     try {
-                        drunkenness = (String)jsonObject.get("drunkenness");
-                    } catch (JSONException e) {
+                        String str = (String) jsonObject.get("drunkenness");
+                        drunkenness = Float.parseFloat(str);
+                    } catch (Exception e) {
 
                     }
-                    Log.d(TAG, "DRUNKENNESS = " + drunkenness);
-                    GemmaColour gemmaColour = GemmaColour.PURPLE;
-                    if (drunkenness != null && drunkenness.compareToIgnoreCase("3.0") < 0) {
-                        gemmaColour = GemmaColour.RED;
-                    } else if (drunkenness != null){
-                        gemmaColour = GemmaColour.GREEN;
-                    }
                     try {
-                        colourChangingService.changeGemmaColour(gemmaColour);
-                    } catch (InterruptedException e) {
+                        if (drunkenness != null && drunkenness < 3.0f) {
+                            Log.d(TAG, "CHANGING " + drunkenness);
+                            colourChangingService.changeGemmaColour(GemmaColour.PINK);
+                        } else {
+                            colourChangingService.changeGemmaColour(GemmaColour.BLACK);
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
-        } catch(Exception e) {
+        } catch (Exception e) {
 
         }
     }

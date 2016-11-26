@@ -24,7 +24,7 @@ public class BleControllerModule extends ReactContextBaseJavaModule implements A
     }
 
     @ReactMethod
-    public void changeColourToRed(Promise promise) throws InterruptedException {
+    public void changeColourToRed(Promise promise) throws Exception {
         if (colourChangingService != null) {
             colourChangingService.changeGemmaColour(GemmaColour.RED);
             promise.resolve(true);

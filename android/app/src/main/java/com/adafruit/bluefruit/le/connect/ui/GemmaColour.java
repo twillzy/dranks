@@ -8,7 +8,8 @@ public enum GemmaColour {
     ORANGE(-25600),
     YELLOW(-3840),
     WHITE(-1),
-    PINK(-65292);
+    PINK(-65292),
+    BLACK(0);
 
     private final int colour;
 

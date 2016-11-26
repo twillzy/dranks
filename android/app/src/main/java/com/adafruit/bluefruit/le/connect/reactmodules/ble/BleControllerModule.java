@@ -33,16 +33,6 @@ public class BleControllerModule extends ReactContextBaseJavaModule implements A
         }
     }
 
-    @ReactMethod
-    public void cycleColours(Promise promise) throws Exception {
-        if (colourChangingService != null) {
-            colourChangingService.momentOfDelight();
-            promise.resolve(true);
-        } else {
-            promise.reject(":(", ":(");
-        }
-    }
-
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 

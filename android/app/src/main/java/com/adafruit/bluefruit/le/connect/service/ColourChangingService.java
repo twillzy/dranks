@@ -36,7 +36,7 @@ public class ColourChangingService {
     }
 
     public void momentOfDelight() throws Exception {
-        changeColour(GemmaColour.BLUE.getColour());
+        changeColour(GemmaColour.GREEN.getColour());
 
         Thread.sleep(500);
 
@@ -119,4 +119,5 @@ public class ColourChangingService {
     public void onServicesDiscovered() {
         mUartService = mBleManager.getGattService(UUID_SERVICE);
     }
+
 }

@@ -46,7 +46,11 @@ public class WebSocketService {
             mSocket.on("drinkBought", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-
+                    try {
+                        colourChangingService.momentOfDelight();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         } catch(Exception e) {

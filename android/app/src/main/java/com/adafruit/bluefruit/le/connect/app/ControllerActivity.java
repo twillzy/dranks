@@ -90,27 +90,27 @@ public class ControllerActivity extends UartInterfaceActivity implements GoogleA
         mControllerListView.setExpanded(true);
 
         ExpandableHeightListView interfaceListView = (ExpandableHeightListView) findViewById(R.id.interfaceListView);
-        ArrayAdapter<String> interfaceListAdapter = new ArrayAdapter<>(this, R.layout.layout_controller_interface_title, R.id.titleTextView, getResources().getStringArray(R.array.controller_interface_items));
-        assert interfaceListView != null;
-        interfaceListView.setAdapter(interfaceListAdapter);
-        interfaceListView.setExpanded(true);
-        interfaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    Intent intent = new Intent(ControllerActivity.this, ColorPickerActivity.class);
-                    startActivityForResult(intent, kActivityRequestCode_ColorPickerActivity);
-                } else if (position == 1) {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.parse("package:" + getPackageName()));
-                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-                } else {
-                    Intent intent = new Intent(ControllerActivity.this, MyReactActivity.class);
-                    startActivityForResult(intent, kActivityRequestCode_MyReactActivity);
-                }
-            }
-        });
+//        ArrayAdapter<String> interfaceListAdapter = new ArrayAdapter<>(this, R.layout.layout_controller_interface_title, R.id.titleTextView, getResources().getStringArray(R.array.controller_interface_items));
+//        assert interfaceListView != null;
+//        interfaceListView.setAdapter(interfaceListAdapter);
+//        interfaceListView.setExpanded(true);
+//        interfaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.M)
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if (position == 0) {
+//                    Intent intent = new Intent(ControllerActivity.this, ColorPickerActivity.class);
+//                    startActivityForResult(intent, kActivityRequestCode_ColorPickerActivity);
+//                } else if (position == 1) {
+//                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                                Uri.parse("package:" + getPackageName()));
+//                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+//                } else {
+//                    Intent intent = new Intent(ControllerActivity.this, MyReactActivity.class);
+//                    startActivityForResult(intent, kActivityRequestCode_MyReactActivity);
+//                }
+//            }
+//        });
 
         mUartTooltipViewGroup = (ViewGroup) findViewById(R.id.uartTooltipViewGroup);
         SharedPreferences preferences = getSharedPreferences(kPreferences, Context.MODE_PRIVATE);

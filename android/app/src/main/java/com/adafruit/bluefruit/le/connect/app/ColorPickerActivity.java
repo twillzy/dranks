@@ -197,4 +197,28 @@ public class ColorPickerActivity extends UartInterfaceActivity implements ColorP
         byte[] result = buffer.array();
         sendDataWithCRC(result);
     }
+
+    public void changeColour(int colour) {
+        // Set the old color
+        mColorPicker.setOldCenterColor(colour);
+
+        // Send selected color !Crgb
+        byte r = (byte) ((colour >> 16) & 0xFF);
+        byte g = (byte) ((colour >> 8) & 0xFF);
+        byte b = (byte) ((colour >> 0) & 0xFF);
+
+        ByteBuffer buffer = ByteBuffer.allocate(2 + 3 * 1).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+
+        // prefix
+        String prefix = "!C";
+        buffer.put(prefix.getBytes());
+
+        // values
+        buffer.put(r);
+        buffer.put(g);
+        buffer.put(b);
+
+        byte[] result = buffer.array();
+        sendDataWithCRC(result);
+    }
 }

@@ -1,4 +1,4 @@
-package com.adafruit.bluefruit.le.connect.nfc;
+package com.adafruit.bluefruit.le.connect.reactmodules.nfc;
 
 import android.app.Activity;
 import android.app.PendingIntent;

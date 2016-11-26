@@ -6,12 +6,15 @@ import {
   View
 } from 'react-native';
 
+import BLEControllerModule from './App/Modules/BLEControllerModule';
+
 class HelloWorld extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       budget : 200
     };
+    BLEControllerModule.changeColourToRed();
   }
   render() {
     return (

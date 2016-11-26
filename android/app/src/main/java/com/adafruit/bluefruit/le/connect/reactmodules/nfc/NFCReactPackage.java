@@ -1,4 +1,4 @@
-package com.adafruit.bluefruit.le.connect.nfc;
+package com.adafruit.bluefruit.le.connect.reactmodules.nfc;
 
 import android.app.Activity;
 
@@ -23,7 +23,7 @@ public class NFCReactPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new NFCModule(reactContext, activity));
+//        modules.add(new NFCModule(reactContext, activity));
         return modules;
     }
 

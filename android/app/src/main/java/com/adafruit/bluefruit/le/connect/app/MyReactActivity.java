@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.adafruit.bluefruit.le.connect.BuildConfig;
+import com.adafruit.bluefruit.le.connect.reactmodules.ble.BleControllerReactPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.common.LifecycleState;
@@ -25,6 +26,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
                 .setBundleAssetName("index.android.bundle")
                 .setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
+                .addPackage(new BleControllerReactPackage())
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

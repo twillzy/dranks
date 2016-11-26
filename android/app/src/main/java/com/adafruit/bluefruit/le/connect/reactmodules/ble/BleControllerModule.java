@@ -3,7 +3,6 @@ package com.adafruit.bluefruit.le.connect.reactmodules.ble;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.adafruit.bluefruit.le.connect.ble.BleManager;
 import com.adafruit.bluefruit.le.connect.service.ColourChangingService;
 import com.adafruit.bluefruit.le.connect.ui.GemmaColour;
 import com.facebook.react.bridge.ActivityEventListener;
@@ -15,23 +14,23 @@ import com.facebook.react.bridge.ReactMethod;
 
 public class BleControllerModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
-    private Promise promise = null;
-    private ColourChangingService colourChangingService = new ColourChangingService(BleManager.getInstance(getReactApplicationContext()));
+    private ColourChangingService colourChangingService = null;
 
-    public BleControllerModule(ReactApplicationContext reactContext) {
+    public BleControllerModule(ReactApplicationContext reactContext, ColourChangingService colourChangingService) {
         super(reactContext);
-    }
-
-    public BleControllerModule(ReactApplicationContext reactContext, Activity activity) {
-        super(reactContext);
+        this.colourChangingService = colourChangingService;
         reactContext.addLifecycleEventListener(this);
         reactContext.addActivityEventListener(this);
     }
 
     @ReactMethod
     public void changeColourToRed(Promise promise) {
-        colourChangingService.changeColour(GemmaColour.RED);
-        promise.resolve(true);
+        if (colourChangingService != null) {
+            colourChangingService.changeColour(GemmaColour.RED);
+            promise.resolve(true);
+        } else {
+            promise.reject(":(", ":(");
+        }
     }
 
     @ReactMethod

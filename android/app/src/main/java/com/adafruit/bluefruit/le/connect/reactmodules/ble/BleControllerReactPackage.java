@@ -1,5 +1,6 @@
 package com.adafruit.bluefruit.le.connect.reactmodules.ble;
 
+import com.adafruit.bluefruit.le.connect.service.ColourChangingService;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
@@ -12,14 +13,17 @@ import java.util.List;
 
 public class BleControllerReactPackage implements ReactPackage {
 
-    public BleControllerReactPackage() {
+    private final ColourChangingService colourChangingService;
+
+    public BleControllerReactPackage(ColourChangingService colourChangingService) {
         super();
+        this.colourChangingService = colourChangingService;
     }
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new BleControllerModule(reactContext));
+        modules.add(new BleControllerModule(reactContext, colourChangingService));
         return modules;
     }
 

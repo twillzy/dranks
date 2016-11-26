@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.adafruit.bluefruit.le.connect.BuildConfig;
+import com.adafruit.bluefruit.le.connect.ble.BleManager;
 import com.adafruit.bluefruit.le.connect.reactmodules.ble.BleControllerReactPackage;
+import com.adafruit.bluefruit.le.connect.service.ColourChangingService;
 import com.adafruit.bluefruit.le.connect.service.WebSocketService;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
@@ -16,19 +18,21 @@ import com.facebook.react.shell.MainReactPackage;
 public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
-    private WebSocketService webSocketService = new WebSocketService();
+    private WebSocketService webSocketService;
+    private ColourChangingService colourChangingService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        colourChangingService = new ColourChangingService(BleManager.getInstance(this.getApplicationContext()));
+        webSocketService = new WebSocketService(colourChangingService);
         mReactRootView = new ReactRootView(this);
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(getApplication())
                 .setBundleAssetName("index.android.bundle")
                 .setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
-                .addPackage(new BleControllerReactPackage())
+                .addPackage(new BleControllerReactPackage(colourChangingService))
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

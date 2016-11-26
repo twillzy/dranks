@@ -4,16 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,8 +19,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -40,13 +31,8 @@ import com.adafruit.bluefruit.le.connect.ui.utils.ExpandableHeightListView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 
-import java.nio.ByteBuffer;
-
-public class ControllerActivity extends UartInterfaceActivity implements SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ControllerActivity extends UartInterfaceActivity implements GoogleApiClient.OnConnectionFailedListener {
     // Config
     private final static boolean kKeepUpdatingParentValuesInChildActivities = true;
 
@@ -83,20 +69,8 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
 
     // Data
     private Handler sendDataHandler = new Handler();
-    private GoogleApiClient mGoogleApiClient;
-    private SensorManager mSensorManager;
-    private SensorData[] mSensorData;
-    private Sensor mAccelerometer;
-    private Sensor mGyroscope;
-    private Sensor mMagnetometer;
 
-    private float[] mRotation = new float[9];
-    private float[] mOrientation = new float[3];
-    private float[] mQuaternion = new float[4];
 
-    private DataFragment mRetainedDataFragment;
-
-    private boolean isSensorPollingEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,54 +80,46 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         //Log.d(TAG, "onCreate");
 
         mBleManager = BleManager.getInstance(this);
-        restoreRetainedDataFragment();
 
         // UI
         mControllerListView = (ExpandableHeightExpandableListView) findViewById(R.id.controllerListView);
-        mControllerListAdapter = new ExpandableListAdapter(this, mSensorData);
         mControllerListView.setAdapter(mControllerListAdapter);
         mControllerListView.setExpanded(true);
 
         ExpandableHeightListView interfaceListView = (ExpandableHeightListView) findViewById(R.id.interfaceListView);
-        ArrayAdapter<String> interfaceListAdapter = new ArrayAdapter<>(this, R.layout.layout_controller_interface_title, R.id.titleTextView, getResources().getStringArray(R.array.controller_interface_items));
-        assert interfaceListView != null;
-        interfaceListView.setAdapter(interfaceListAdapter);
-        interfaceListView.setExpanded(true);
-        interfaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    Intent intent = new Intent(ControllerActivity.this, ColorPickerActivity.class);
-                    startActivityForResult(intent, kActivityRequestCode_ColorPickerActivity);
-                } else if (position == 1) {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.parse("package:" + getPackageName()));
-                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-                } else {
-                    Intent intent = new Intent(ControllerActivity.this, MyReactActivity.class);
-                    startActivityForResult(intent, kActivityRequestCode_MyReactActivity);
-                }
-            }
-        });
+//        ArrayAdapter<String> interfaceListAdapter = new ArrayAdapter<>(this, R.layout.layout_controller_interface_title, R.id.titleTextView, getResources().getStringArray(R.array.controller_interface_items));
+//        assert interfaceListView != null;
+//        interfaceListView.setAdapter(interfaceListAdapter);
+//        interfaceListView.setExpanded(true);
+//        interfaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.M)
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if (position == 0) {
+//                    Intent intent = new Intent(ControllerActivity.this, ColorPickerActivity.class);
+//                    startActivityForResult(intent, kActivityRequestCode_ColorPickerActivity);
+//                } else if (position == 1) {
+//                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                                Uri.parse("package:" + getPackageName()));
+//                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+//                } else {
+//                    Intent intent = new Intent(ControllerActivity.this, MyReactActivity.class);
+//                    startActivityForResult(intent, kActivityRequestCode_MyReactActivity);
+//                }
+//            }
+//        });
 
         mUartTooltipViewGroup = (ViewGroup) findViewById(R.id.uartTooltipViewGroup);
         SharedPreferences preferences = getSharedPreferences(kPreferences, Context.MODE_PRIVATE);
         final boolean showUartTooltip = preferences.getBoolean(kPreferences_uartToolTip, true);
         mUartTooltipViewGroup.setVisibility(showUartTooltip ? View.VISIBLE : View.GONE);
 
-        // Sensors
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-
-        // Google Play Services (used for location updates)
-        buildGoogleApiClient();
 
         // Start services
         onServicesDiscovered();
+
+        Intent intent = new Intent(ControllerActivity.this, MyReactActivity.class);
+        startActivityForResult(intent, kActivityRequestCode_MyReactActivity);
     }
 
     @Override
@@ -161,16 +127,11 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         super.onStart();
 
         Log.d(TAG, "onStart");
-        mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop");
-
-        if (!kKeepUpdatingParentValuesInChildActivities) {
-            mGoogleApiClient.disconnect();
-        }
         super.onStop();
     }
 
@@ -194,13 +155,6 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         // Setup listeners
         mBleManager.setBleListener(this);
 
-        registerEnabledSensorListeners(true);
-
-        // Setup send data task
-        if (!isSensorPollingEnabled) {
-            sendDataHandler.postDelayed(mPeriodicallySendData, kSendDataInterval);
-            isSensorPollingEnabled = true;
-        }
     }
 
     @Override
@@ -210,11 +164,8 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         super.onPause();
 
         if (!kKeepUpdatingParentValuesInChildActivities) {
-            registerEnabledSensorListeners(false);
-
             // Remove send data task
             sendDataHandler.removeCallbacksAndMessages(null);
-            isSensorPollingEnabled = false;
         }
     }
 
@@ -224,47 +175,11 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
 
         if (kKeepUpdatingParentValuesInChildActivities) {
             // Remove all sensor polling
-            registerEnabledSensorListeners(false);
             sendDataHandler.removeCallbacksAndMessages(null);
-            isSensorPollingEnabled = false;
-            mGoogleApiClient.disconnect();
         }
-
-        // Retain data
-        saveRetainedDataFragment();
 
         super.onDestroy();
     }
-
-    private Runnable mPeriodicallySendData = new Runnable() {
-        @Override
-        public void run() {
-            final String[] prefixes = {"!Q", "!A", "!G", "!M", "!L"};     // same order that kSensorType
-
-            for (int i = 0; i < mSensorData.length; i++) {
-                SensorData sensorData = mSensorData[i];
-
-                if (sensorData.enabled && sensorData.values != null) {
-                    ByteBuffer buffer = ByteBuffer.allocate(2 + sensorData.values.length * 4).order(java.nio.ByteOrder.LITTLE_ENDIAN);
-
-                    // prefix
-                    String prefix = prefixes[sensorData.sensorType];
-                    buffer.put(prefix.getBytes());
-
-                    // values
-                    for (int j = 0; j < sensorData.values.length; j++) {
-                        buffer.putFloat(sensorData.values[j]);
-                    }
-
-                    byte[] result = buffer.array();
-                    Log.d(TAG, "Send data for sensor: " + i);
-                    sendDataWithCRC(result);
-                }
-            }
-
-            sendDataHandler.postDelayed(this, kSendDataInterval);
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -331,14 +246,6 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         }
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
     private boolean isLocationEnabled() {
         int locationMode;
         try {
@@ -350,56 +257,6 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
 
         return locationMode != Settings.Secure.LOCATION_MODE_OFF;
 
-    }
-
-    private void registerEnabledSensorListeners(boolean register) {
-
-        // Accelerometer
-        if (register && (mSensorData[kSensorType_Accelerometer].enabled || mSensorData[kSensorType_Quaternion].enabled)) {
-            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        } else {
-            mSensorManager.unregisterListener(this, mAccelerometer);
-        }
-
-        // Gyroscope
-        if (register && mSensorData[kSensorType_Gyroscope].enabled) {
-            mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
-        } else {
-            mSensorManager.unregisterListener(this, mGyroscope);
-        }
-
-        // Magnetometer
-        if (register && (mSensorData[kSensorType_Magnetometer].enabled || mSensorData[kSensorType_Quaternion].enabled)) {
-            if (mMagnetometer == null) {
-                new AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.controller_magnetometermissing))
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            } else {
-                mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_NORMAL);
-            }
-        } else {
-            mSensorManager.unregisterListener(this, mMagnetometer);
-        }
-
-        // Location
-        if (mGoogleApiClient.isConnected()) {
-            if (register && mSensorData[kSensorType_Location].enabled) {
-                LocationRequest locationRequest = new LocationRequest();
-                locationRequest.setInterval(2000);
-                locationRequest.setFastestInterval(500);
-                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-                // Location updates should have already been granted to scan for bluetooth peripherals, so we dont ask for them again
-                try {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
-                } catch (SecurityException e) {
-                    Log.e(TAG, "Security exception requesting location updates: " + e);
-                }
-            } else {
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            }
-        }
     }
 
     public void onClickCloseTooltip(View view) {
@@ -428,64 +285,12 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
             }
         }
 
-        // Enable sensor
-        mSensorData[groupPosition].enabled = enabled;
-        registerEnabledSensorListeners(true);
 
         // Expand / Collapse
         if (enabled) {
             mControllerListView.expandGroup(groupPosition, true);
         } else {
             mControllerListView.collapseGroup(groupPosition);
-        }
-    }
-
-    @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something here if sensor accuracy changes.
-    }
-
-    @Override
-    public final void onSensorChanged(SensorEvent event) {
-        int sensorType = event.sensor.getType();
-        if (sensorType == Sensor.TYPE_ACCELEROMETER) {
-            mSensorData[kSensorType_Accelerometer].values = event.values;
-
-            updateOrientation();            // orientation depends on Accelerometer and Magnetometer
-            mControllerListAdapter.notifyDataSetChanged();
-        } else if (sensorType == Sensor.TYPE_GYROSCOPE) {
-            mSensorData[kSensorType_Gyroscope].values = event.values;
-
-            mControllerListAdapter.notifyDataSetChanged();
-        } else if (sensorType == Sensor.TYPE_MAGNETIC_FIELD) {
-            mSensorData[kSensorType_Magnetometer].values = event.values;
-
-            updateOrientation();            // orientation depends on Accelerometer and Magnetometer
-            mControllerListAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private void updateOrientation() {
-        float[] lastAccelerometer = mSensorData[kSensorType_Accelerometer].values;
-        float[] lastMagnetometer = mSensorData[kSensorType_Magnetometer].values;
-        if (lastAccelerometer != null && lastMagnetometer != null) {
-            SensorManager.getRotationMatrix(mRotation, null, lastAccelerometer, lastMagnetometer);
-            SensorManager.getOrientation(mRotation, mOrientation);
-
-            final boolean kUse4Components = true;
-            if (kUse4Components) {
-                SensorManager.getQuaternionFromVector(mQuaternion, mOrientation);
-                // Quaternions in Android are stored as [w, x, y, z], so we change it to [x, y, z, w]
-                float w = mQuaternion[0];
-                mQuaternion[0] = mQuaternion[1];
-                mQuaternion[1] = mQuaternion[2];
-                mQuaternion[2] = mQuaternion[3];
-                mQuaternion[3] = w;
-
-                mSensorData[kSensorType_Quaternion].values = mQuaternion;
-            } else {
-                mSensorData[kSensorType_Quaternion].values = mOrientation;
-            }
         }
     }
 
@@ -510,76 +315,10 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         finish();
     }
 
-    /*
-    @Override
-    public void onServicesDiscovered() {
-        mUartService = mBleManager.getGattService(UUID_SERVICE);
-    }
-
-    @Override
-    public void onDataAvailable(BluetoothGattCharacteristic characteristic) {
-
-    }
-
-    @Override
-    public void onDataAvailable(BluetoothGattDescriptor descriptor) {
-
-    }
-
-    @Override
-    public void onReadRemoteRssi(int rssi) {
-
-    }
-    */
-
-    // endregion
-
-    // region Google API Callbacks
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d(TAG, "Google Play Services connected");
-
-        // Location updates should have already been granted to scan for bluetooth peripherals, so we dont ask for them again
-        try {
-            setLastLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
-        } catch (SecurityException e) {
-            Log.e(TAG, "Security exception requesting location updates: " + e);
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d(TAG, "Google Play Services suspended");
-
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "Google Play Services connection failed");
     }
-    // endregion
-
-    // region LocationListener
-    @Override
-    public void onLocationChanged(Location location) {
-        setLastLocation(location);
-    }
-
-    // endregion
-
-    private void setLastLocation(Location location) {
-        if (location != null) {
-            SensorData sensorData = mSensorData[kSensorType_Location];
-
-            float[] values = new float[3];
-            values[0] = (float) location.getLatitude();
-            values[1] = (float) location.getLongitude();
-            values[2] = (float) location.getAltitude();
-            sensorData.values = values;
-        }
-        mControllerListAdapter.notifyDataSetChanged();
-    }
-
 
     // region ExpandableListAdapter
     private class SensorData {
@@ -725,33 +464,4 @@ public class ControllerActivity extends UartInterfaceActivity implements SensorE
         }
     }
 
-    private void restoreRetainedDataFragment() {
-        // find the retained fragment
-        FragmentManager fm = getFragmentManager();
-        mRetainedDataFragment = (DataFragment) fm.findFragmentByTag(TAG);
-
-        if (mRetainedDataFragment == null) {
-            // Create
-            mRetainedDataFragment = new DataFragment();
-            fm.beginTransaction().add(mRetainedDataFragment, TAG).commit();
-
-            // Init
-            mSensorData = new SensorData[kNumSensorTypes];
-            for (int i = 0; i < kNumSensorTypes; i++) {
-                SensorData sensorData = new SensorData();
-                sensorData.sensorType = i;
-                sensorData.enabled = false;
-                mSensorData[i] = sensorData;
-            }
-
-        } else {
-            // Restore status
-            mSensorData = mRetainedDataFragment.mSensorData;
-        }
-    }
-
-    private void saveRetainedDataFragment() {
-        mRetainedDataFragment.mSensorData = mSensorData;
-    }
-    // endregion
 }

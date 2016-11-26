@@ -5,13 +5,18 @@ import {
   Text,
   View
 } from 'react-native';
-import NFCModule from './App/Modules/NFCModule';
 
 class HelloWorld extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      budget : 200
+    };
+  }
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.start}>Tag NFC to Start Partying</Text>
+        <Text style={styles.start}>Budget: ${this.state.budget}</Text>
       </View>
     )
   }

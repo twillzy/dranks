@@ -11,6 +11,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
@@ -50,7 +51,7 @@ public class NFCManager {
     }
 
     public void disableDispatch() {
-        nfcAdpt.disableForegroundDispatch(activity);
+//        nfcAdpt.disableForegroundDispatch(activity);
     }
 
     public static class NFCNotSupported extends Exception {
@@ -93,6 +94,7 @@ public class NFCManager {
     }
 
     public List<NdefMessage> readTag(Intent intent) {
+        Log.d("NFC", "reading nfc");
         String action = intent.getAction();
         NdefMessage[] msgs = {};
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)

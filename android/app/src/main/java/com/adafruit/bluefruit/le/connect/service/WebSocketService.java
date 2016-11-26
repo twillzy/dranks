@@ -7,6 +7,9 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 
 public class WebSocketService {
@@ -59,7 +62,21 @@ public class WebSocketService {
             mSocket.on("breathalyzer", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    colourChangingService.changeColour(GemmaColour.GREEN);
+                    JSONObject jsonObject = (JSONObject) args[0];
+                    String drunkenness = null;
+                    try {
+                        drunkenness = (String)jsonObject.get("drunkenness");
+                    } catch (JSONException e) {
+
+                    }
+                    Log.d(TAG, "DRUNKENNESS = " + drunkenness);
+                    GemmaColour gemmaColour = GemmaColour.PURPLE;
+                    if (drunkenness != null && drunkenness.compareToIgnoreCase("3.0") < 0) {
+                        gemmaColour = GemmaColour.RED;
+                    } else if (drunkenness != null){
+                        gemmaColour = GemmaColour.GREEN;
+                    }
+                    colourChangingService.changeColour(gemmaColour);
                 }
             });
         } catch(Exception e) {

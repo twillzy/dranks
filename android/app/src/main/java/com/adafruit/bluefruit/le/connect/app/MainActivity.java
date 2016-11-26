@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements BleManager.BleMan
     private FirmwareUpdater mFirmwareUpdater;
     private PeripheralList mPeripheralList;
 
-    private ArrayList<BluetoothDeviceData> mScannedDevices;
+    private ArrayList<BluetoothDeviceData> mScannedDevices = new ArrayList<>();
     private BluetoothDeviceData mSelectedDeviceData;
     private Class<?> mComponentToStartWhenConnected;
     private boolean mShouldEnableWifiOnQuit = false;

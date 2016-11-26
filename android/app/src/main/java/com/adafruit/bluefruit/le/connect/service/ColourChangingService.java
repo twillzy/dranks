@@ -6,6 +6,7 @@ import android.util.Log;
 import com.adafruit.bluefruit.le.connect.app.UartInterfaceActivity;
 import com.adafruit.bluefruit.le.connect.ble.BleManager;
 import com.adafruit.bluefruit.le.connect.ble.BleUtils;
+import com.adafruit.bluefruit.le.connect.ui.GemmaColour;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -32,8 +33,8 @@ public class ColourChangingService {
         onServicesDiscovered();
     }
 
-    public void changeColourToRed() {
-        changeColour(234252352);
+    public void changeColour(GemmaColour gemmaColour) {
+        changeColour(gemmaColour.getColour());
     }
 
     private void changeColour(int colour) {

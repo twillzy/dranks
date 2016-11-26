@@ -161,6 +161,8 @@ public class ColorPickerActivity extends UartInterfaceActivity implements ColorP
 
     @Override
     public void onColorChanged(int color) {
+        Log.d(TAG, "SELECTED COLOUR = " + color);
+
         // Save selected color
         mSelectedColor = color;
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.adafruit.bluefruit.le.connect.ble.BleManager;
 import com.adafruit.bluefruit.le.connect.service.ColourChangingService;
+import com.adafruit.bluefruit.le.connect.ui.GemmaColour;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.Promise;
@@ -30,7 +31,7 @@ public class BleControllerModule extends ReactContextBaseJavaModule implements A
     @ReactMethod
     public void changeColourToRed(Promise promise) {
         this.promise = promise;
-        colourChangingService.changeColourToRed();
+        colourChangingService.changeColour(GemmaColour.RED);
         promise.resolve(true);
     }
 

@@ -8,9 +8,6 @@ import {
 import NFCModule from './App/Modules/NFCModule';
 
 class HelloWorld extends React.Component {
-  constructor() {
-  }
-
   render() {
     return (
       <View style={styles.container}>

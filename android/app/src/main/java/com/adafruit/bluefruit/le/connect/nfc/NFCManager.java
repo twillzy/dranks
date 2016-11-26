@@ -10,8 +10,11 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
+import android.os.Parcelable;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class NFCManager {
@@ -39,8 +42,8 @@ public class NFCManager {
         Intent nfcIntent = new Intent(activity, getClass());
         nfcIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(activity, 0, nfcIntent, 0);
-        IntentFilter[] intentFiltersArray = new IntentFilter[] {};
-        String[][] techList = new String[][] { { android.nfc.tech.Ndef.class.getName() }, { android.nfc.tech.NdefFormatable.class.getName() } };
+        IntentFilter[] intentFiltersArray = new IntentFilter[]{};
+        String[][] techList = new String[][]{{android.nfc.tech.Ndef.class.getName()}, {android.nfc.tech.NdefFormatable.class.getName()}};
 
 
         nfcAdpt.enableForegroundDispatch(activity, pendingIntent, intentFiltersArray, techList);
@@ -65,7 +68,7 @@ public class NFCManager {
     }
 
 
-    public void writeTag(Tag tag, NdefMessage message)  {
+    public void writeTag(Tag tag, NdefMessage message) {
         if (tag != null) {
             try {
                 Ndef ndefTag = Ndef.get(tag);
@@ -78,18 +81,35 @@ public class NFCManager {
                         nForm.format(message);
                         nForm.close();
                     }
-                }
-                else {
+                } else {
                     ndefTag.connect();
                     ndefTag.writeNdefMessage(message);
                     ndefTag.close();
                 }
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
+    public List<NdefMessage> readTag(Intent intent) {
+        String action = intent.getAction();
+        NdefMessage[] msgs = {};
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            Parcelable[] rawMsgs = intent
+                    .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            if (rawMsgs != null) {
+                msgs = new NdefMessage[rawMsgs.length];
+                for (int i = 0; i < rawMsgs.length; i++) {
+                    msgs[i] = (NdefMessage) rawMsgs[i];
+                }
+            }
+        }
+        return Arrays.asList(msgs);
+    }
+
 
     public NdefMessage createUriMessage(String content, String type) {
         NdefRecord record = NdefRecord.createUri(type + content);
@@ -97,6 +117,7 @@ public class NFCManager {
         return msg;
 
     }
+
     public NdefMessage createTextMessage(String content) {
         try {
             // Get UTF-8 byte
@@ -112,8 +133,7 @@ public class NFCManager {
             payload.write(text, 0, textLength);
             NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], payload.toByteArray());
             return new NdefMessage(new NdefRecord[]{record});
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -123,7 +143,7 @@ public class NFCManager {
     public NdefMessage createExternalMessage(String content) {
         NdefRecord externalRecord = NdefRecord.createExternal("com.survivingwithandroid", "data", content.getBytes());
 
-        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[] { externalRecord });
+        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{externalRecord});
 
         return ndefMessage;
     }

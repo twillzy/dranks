@@ -17,17 +17,39 @@ public class WebSocketService {
         try {
             mSocket = IO.socket("https://fathomless-peak-84606.herokuapp.com");
             Socket connect = mSocket.connect();
+            onDrinkBought();
+            onBreathalyzer();
         } catch (URISyntaxException e) {
             Log.d(TAG, "Error: " + e.getMessage());
         }
     }
 
-    public void onDrinkBought() {
+    public void disconnect() {
+        mSocket.disconnect();
+    }
+
+    private void onDrinkBought() {
         if (mSocket == null) {
             return;
         }
         try {
             mSocket.on("drinkBought", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+
+                }
+            });
+        } catch(Exception e) {
+
+        }
+    }
+
+    private void onBreathalyzer() {
+        if (mSocket == null) {
+            return;
+        }
+        try {
+            mSocket.on("breathalyzer", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
 

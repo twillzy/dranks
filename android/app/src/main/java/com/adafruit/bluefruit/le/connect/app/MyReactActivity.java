@@ -50,6 +50,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostPause(this);
         }
+        webSocketService.disconnect();
     }
 
     @Override
@@ -59,6 +60,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostResume(this, this);
         }
+        webSocketService.connectWebSocket();
     }
 
     @Override
@@ -68,6 +70,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostDestroy(this);
         }
+        webSocketService.disconnect();
     }
 
     @Override

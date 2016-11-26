@@ -18,6 +18,7 @@ public class WebSocketService {
     private static final Integer BUDGET = 200;
     private final ColourChangingService colourChangingService;
     private Socket mSocket = null;
+    private int runningTotal = 0;
 
     public WebSocketService(ColourChangingService colourChangingService) {
         this.colourChangingService = colourChangingService;
@@ -49,10 +50,12 @@ public class WebSocketService {
                     try {
                         JSONObject jsonObject = (JSONObject) args[0];
                         Integer totalPrice = (Integer) jsonObject.get("totalPrice");
-                        if (totalPrice != null && totalPrice < BUDGET) {
+                        runningTotal += totalPrice / 2;
+                        if (totalPrice != null && runningTotal < BUDGET) {
                             colourChangingService.momentOfDelight();
                         } else {
                             colourChangingService.changeGemmaColour(GemmaColour.RED);
+                            mSocket.disconnect();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -86,6 +89,7 @@ public class WebSocketService {
                             colourChangingService.changeGemmaColour(GemmaColour.PINK);
                         } else {
                             colourChangingService.changeGemmaColour(GemmaColour.BLACK);
+                            mSocket.disconnect();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

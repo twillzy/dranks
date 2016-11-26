@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 
 import com.adafruit.bluefruit.le.connect.BuildConfig;
 import com.adafruit.bluefruit.le.connect.reactmodules.ble.BleControllerReactPackage;
+import com.adafruit.bluefruit.le.connect.service.WebSocketService;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.common.LifecycleState;
@@ -15,6 +16,7 @@ import com.facebook.react.shell.MainReactPackage;
 public class MyReactActivity extends Activity implements DefaultHardwareBackBtnHandler {
     private ReactRootView mReactRootView;
     private ReactInstanceManager mReactInstanceManager;
+    private WebSocketService webSocketService = new WebSocketService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class MyReactActivity extends Activity implements DefaultHardwareBackBtnH
         mReactRootView.startReactApplication(mReactInstanceManager, "HelloWorld", null);
 
         setContentView(mReactRootView);
+        webSocketService.connectWebSocket();
     }
 
     @Override
